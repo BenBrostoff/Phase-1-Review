@@ -26,11 +26,16 @@ class Student
 		$db.execute("DELETE FROM students WHERE id = ?", @id)
 	end
 
-	def all
+	def self.count
+		$db.execute("SELECT COUNT(id) FROM students")
 	end
 
 	def update(field, value)
 		$db.execute("UPDATE students SET #{field} = ? WHERE id = ?",[value, @id])
+	end
+
+	def self.where(expression, value)
+		$db.execute("SELECT * FROM students where #{expression}", value)
 	end
 
 end
@@ -46,5 +51,4 @@ class StudentParser
 
 end
 
-adrian = Student.new(:first_name => "Adrian", :last_name => "Soghoian", :email => "adriansoghoian@gmail.com", :phone => "asdfwef", :grade => "100")
-adrian.save
+adrian = Student.new(:first_name = "Adrian")
