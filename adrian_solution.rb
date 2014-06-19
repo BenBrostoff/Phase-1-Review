@@ -1,13 +1,11 @@
 require 'csv'
 require 'sqlite3'
 
-# Steps
-# Pull in CSV data ==> Database
-# Create class for Students with Create, Read, Update, Delete methods
-# Create StudentParser class that executes the import from CSV to DB methods
+
+$db = SQLite3::Database.new "student_data.db"
 
 class Student 
-	include StudentParser 
+	attr_accessor :id, :first_name, :last_name, :email, :phone, :grade
 
 	def initialize(args)
 		@id = args[:id]
@@ -20,27 +18,24 @@ class Student
 
 	def save
 		$db.execute("INSERT INTO students (first_name, last_name, email, phone, grade, created_at, updated_at) 
-								 VALUES (?,?,?,?,?,DATETIME('now'), DATETIME('now'))", @first_name, @last_name, @email, @phone, @grade)
+								 VALUES (?,?,?,?,?, DATETIME('now'), DATETIME('now'))", @first_name, @last_name, @email, @phone, @grade)
 		@id = $db.execute("SELECT last_insert_rowid()")
 	end
 
 	def delete
-
+		$db.execute("DELETE FROM students WHERE id = ?", @id)
 	end
 
 	def all
-
 	end
 
-	def include?
-
-
+	def update(field, value)
+		$db.execute("UPDATE students SET #{field} = ? WHERE id = ?",[value, @id])
 	end
 
 end
 
-
-module StudentParser
+class StudentParser
 
 	def import_csv(file)
 		CSV.foreach(file, headers: true) do |row|
@@ -50,3 +45,6 @@ module StudentParser
 	end
 
 end
+
+adrian = Student.new(:first_name => "Adrian", :last_name => "Soghoian", :email => "adriansoghoian@gmail.com", :phone => "asdfwef", :grade => "100")
+adrian.save
